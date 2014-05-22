@@ -18,26 +18,28 @@
  *******************************************************************************/
 
 #include <iostream>
-#include <string>
 #include <unordered_set>
 
 int main()
 {
-  std::unordered_set<int> us1({ 1,2,3,4,5,6,4,5,6,3,4,5 });
-  for (auto i : us1) std::cout << i << ' ';
+  // fill set with values
+  std::unordered_set<int> us({ 1,2,3,4,5,6,5,4,3,2,1 });
+  
+  // dump content of set to screen
+  for (auto i : us) std::cout << i << ' ';
   std::cout << std::endl;
-  std::cout << "count: " << us1.count(4) << std::endl;
-  auto iter1 = us1.equal_range(4);
-  for (auto i = iter1.first;i!=iter1.second;++i) std::cout << *i << ' ';
-  std::cout << std::endl;
-
-  std::cout << std::endl;
-
-  std::unordered_multiset<int> us2({ 1,2,3,4,5,6,4,5,6,3,4,5 });
-  for (auto i : us2) std::cout << i << ' ';
-  std::cout << std::endl;
-  std::cout << "count: " << us2.count(4) << std::endl;
-  auto iter2 = us2.equal_range(4);
-  for (auto i = iter2.first;i!=iter2.second;++i) std::cout << *i << ' ';
+  
+  // returns 0 or 1 depending on wether key is found
+  std::cout << "count of 1: " << us.count(1) << std::endl;
+  std::cout << "count of 2: " << us.count(2) << std::endl;
+  std::cout << "count of 3: " << us.count(3) << std::endl;
+  std::cout << "count of 4: " << us.count(4) << std::endl;
+  std::cout << "count of 5: " << us.count(5) << std::endl;
+  std::cout << "count of 6: " << us.count(6) << std::endl;
+  std::cout << "count of 7: " << us.count(7) << std::endl;
+  
+  // returns the bounds of a range that includes all the elements for a given key
+  auto it = us.equal_range(4);
+  while (it.first!=it.second) std::cout << *it.first++ << ' ';
   std::cout << std::endl;
 }

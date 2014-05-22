@@ -23,54 +23,45 @@
 
 int main()
 {
-  std::unordered_map<int,std::string> um1({
-    { 1, "a"},
-    { 2, "b"},
-    { 3, "c"},
-    { 4, "d"},
-    { 5, "e"},
-    { 6, "f"},
-    { 4, "d"},
-    { 5, "e"},
-    { 6, "f"},
-    { 3, "c"},
-    { 4, "d"},
-    { 5, "e"},
+  // fill map with values
+  std::unordered_map<int,std::string> um({
+    { 1, "a" },
+    { 2, "b" },
+    { 3, "c" },
+    { 4, "d" },
+    { 5, "e" },
+    { 6, "f" },
+    { 4, "d" },
+    { 5, "e" },
+    { 6, "f" },
+    { 3, "c" },
+    { 4, "d" },
+    { 5, "e" },
   });
-  for (auto i : um1) std::cout << i.first << ' ';
+  
+  // dump content of set to screen
+  for (auto i : um) std::cout << i.first << ' ';
   std::cout << std::endl;
-  for (auto i : um1) std::cout << i.second << ' ';
+  for (auto i : um) std::cout << i.second << ' ';
   std::cout << std::endl;
-  std::cout << "count: " << um1.count(4) << std::endl;
-  auto iter1 = um1.equal_range(4);
-  for (auto i = iter1.first;i!=iter1.second;++i) std::cout << i->first << ' ';
-  std::cout << std::endl;
-  for (auto i = iter1.first;i!=iter1.second;++i) std::cout << i->second << ' ';
-  std::cout << std::endl;
+  
+  // returns 0 or 1 depending on wether key is found
+  std::cout << "count of 1: " << um.count(1) << std::endl;
+  std::cout << "count of 2: " << um.count(2) << std::endl;
+  std::cout << "count of 3: " << um.count(3) << std::endl;
+  std::cout << "count of 4: " << um.count(4) << std::endl;
+  std::cout << "count of 5: " << um.count(5) << std::endl;
+  std::cout << "count of 6: " << um.count(6) << std::endl;
+  std::cout << "count of 7: " << um.count(7) << std::endl;
 
+  // returns the bounds of a range that includes all the elements for a given key
+  auto it = um.equal_range(4);
+  for (auto i=it.first;i!=it.second;++i) {
+    std::cout << i->first << " ";
+  }
   std::cout << std::endl;
-
-  std::unordered_multimap<int,std::string> um2({
-    { 1, "a"},
-    { 2, "b"},
-    { 3, "c"},
-    { 4, "d"},
-    { 5, "e"},
-    { 6, "f"},
-    { 4, "d"},
-    { 5, "e"},
-    { 6, "f"},
-    { 3, "c"},
-    { 4, "d"},
-    { 5, "e"},
-  });
-  for (auto i : um2) std::cout << i.first << ' ';
+  for (auto i=it.first;i!=it.second;++i) {
+    std::cout << i->second << " ";
+  }
   std::cout << std::endl;
-  std::cout << "count: " << um2.count(4) << std::endl;
-  auto iter2 = um2.equal_range(4);
-  for (auto i = iter2.first;i!=iter2.second;++i) std::cout << i->first << ' ';
-  std::cout << std::endl;
-  for (auto i = iter2.first;i!=iter2.second;++i) std::cout << i->second << ' ';
-  std::cout << std::endl;
-
 }
