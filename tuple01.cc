@@ -17,34 +17,49 @@
  *  
  *******************************************************************************/
 
-#include <tuple>
 #include <iostream>
 #include <string>
+#include <tuple>
 #include <stdexcept>
 
-std::tuple<double, char, std::string> getStudent(int id)
+// utility function that returns tuples
+std::tuple<std::string,int,int,int> makeColor(const std::string& name)
 {
-  if (id == 0) return std::make_tuple(3.8, 'A', "Lisa Simpson");
-  if (id == 1) return std::make_tuple(2.9, 'C', "Milhouse Van Houten");
-  if (id == 2) return std::make_tuple(1.7, 'D', "Ralph Wiggum");
-  throw std::invalid_argument("id");
+  if (name=="royal blue") return std::make_tuple("royal blue", 0x41, 0x69, 0xE1);
+  if (name=="turquoise") return std::make_tuple("turquoise", 0x40, 0xE0, 0xD0);
+  if (name=="lime") return std::make_tuple("lime", 0x00, 0xFF, 0x00);
+  if (name=="sandy brown") return std::make_tuple("sandy brown", 0xF4, 0xA4, 0x60);
+  throw std::invalid_argument("name");
 }
 
 int main()
 {
-  auto student0 = getStudent(0);
-  std::cout << "ID: 0, "
-      << "GPA: " << std::get<0>(student0) << ", "
-      << "grade: " << std::get<1>(student0) << ", "
-      << "name: " << std::get<2>(student0) << '\n';
+  // get a tuple
+  auto rb = makeColor("royal blue");
+
+  // dump content of tuple to screen
+  std::cout << "name:  " << std::get<0>(rb) << "\n"
+            << "red:   " << std::get<1>(rb) << "\n"
+            << "green: " << std::get<2>(rb) << "\n"
+            << "blue:  " << std::get<3>(rb) << "\n" << std::endl;
   
-  auto student1 = getStudent(1);
-  double gpa1;
-  char grade1;
-  std::tuple_element<2,decltype(student1)>::type name1;
-  std::tie(gpa1, grade1, name1) = getStudent(1);
-  std::cout << "ID: 1, "
-      << "GPA: " << gpa1 << ", "
-      << "grade: " << grade1 << ", "
-      << "name: " << name1 << '\n';
+  // get another tuple
+  auto turquoise = makeColor("turquoise");
+
+  // create local variables based on declaration types of tuple
+  std::tuple_element<0,decltype(turquoise)>::type name;
+  std::tuple_element<1,decltype(turquoise)>::type red;
+  std::tuple_element<2,decltype(turquoise)>::type green;
+
+  // create standard local variable
+  int blue;
+
+  // tie contents of tuple to local variables
+  std::tie(name, red, green, blue) = turquoise;
+
+  // dump content of tuple to screen
+  std::cout << "name:  " << name << "\n"
+            << "red:   " << red << "\n"
+            << "green: " << green << "\n"
+            << "blue:  " << blue << std::endl;
 }
