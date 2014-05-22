@@ -38,8 +38,8 @@ int main()
 {
 	
   std::unordered_map<fpair,fpair> m({  
-  	{ fpair(1.1,1.2), fpair(1.3, 1.4) },
-  	{ fpair(2.1,2.2), fpair(2.3, 2.4) },
+    { fpair(1.1, 1.2), fpair( 1.3, 1.4) },
+    { fpair(2.1, 2.2), fpair( 2.3, 2.4) },
   });
   
   for (auto i : m) std::cout << i.first.first << ' ';
