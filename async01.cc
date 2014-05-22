@@ -18,49 +18,71 @@
  *******************************************************************************/
 
 #include <iostream>
+#include <chrono>
+#include <thread>
 #include <future>
+#include <iomanip>
 
-auto A() -> int {
-  int sum = 0;
-  for (int i=0;i<1000000;++i) {
+using namespace std::chrono;
+
+auto suffering(int n) -> int
+{
+  std::mutex m;
+
+  m.lock();
+  auto tp = system_clock::now();
+  auto tp_c = system_clock::to_time_t(tp);
+  std::cout << "start for  n=" << n << "\t"
+            << std::put_time(std::localtime(&tp_c), "%T")
+            << std::flush << std::endl;
+  m.unlock();
+
+  auto sum = 0;
+  for (int i=0;i<n;++i) {
     sum +=i;
+    std::this_thread::sleep_for(microseconds(100));
   }
-  std::cout << "(A " << sum << ")" << std::endl;
-  return sum;
-}
+  
+  m.lock();
 
-auto B() -> int {
-  int sum = 0;
-  for (int j=0;j<10000;++j) {
-    sum +=j;
-  }
-  std::cout << "(B " << sum << ")" << std::endl;
+  std::cout << "result for n=" << n << "\t" << sum << std::endl;
+
+  tp = system_clock::now();
+  tp_c = system_clock::to_time_t(tp);
+  std::cout << "end for    n=" << n << "\t"
+            << std::put_time(std::localtime(&tp_c), "%T")
+            << std::flush << std::endl;
+  m.unlock();
+            
   return sum;
 }
 
 int main()
 {
-  auto a1 = A();
-  auto b1 = B();
-  std::cout << "1: " << a1 << " " << b1 << std::endl;
+  auto inflictPainA = std::bind(suffering, 100000);
+  auto inflictPainB = std::bind(suffering, 10000);
 
+  std::cout << "test 1:" << std::endl;
+  auto a1 = inflictPainA();
+  auto b1 = inflictPainB();
   std::cout << std::endl;
-
-  auto a2 = std::async(std::launch::async, A);
-  auto b2 = std::async(std::launch::async, B);
+  
+  std::cout << "test 2:" << std::endl;
+  auto a2 = std::async(std::launch::async, inflictPainA);
+  auto b2 = std::async(std::launch::async, inflictPainB);
   a2.wait();
   b2.wait();
-  std::cout << "2: " << a2.get() << " " << b2.get() << std::endl;
-
   std::cout << std::endl;
 
-  auto a3 = std::async(std::launch::async, A);
-  auto b3 = std::async(std::launch::async, B);
-  std::cout << "3: " << a3.get() << " " << b3.get() << std::endl;
-
+  std::cout << "test 3:" << std::endl;
+  auto a3 = std::async(std::launch::deferred, inflictPainA);
+  auto b3 = std::async(std::launch::deferred, inflictPainB);
+  auto c3 = b3.get() + a3.get();
   std::cout << std::endl;
 
-  auto a4 = std::async(std::launch::async, A);
-  auto b4 = std::async(std::launch::async, B);
-  std::cout << "4: " << b4.get() << " " << a4.get() << std::endl;
+  std::cout << "test 4:" << std::endl;
+  auto a4 = std::async(std::launch::deferred | std::launch::async, inflictPainA);
+  auto b4 = std::async(std::launch::deferred | std::launch::async, inflictPainB);
+  auto c4 = b4.get() + a4.get();
+  std::cout << std::endl;
 }
