@@ -64,17 +64,42 @@ int main()
   auto inflictPainA = std::bind(suffering, 40000);
   auto inflictPainB = std::bind(suffering, 20000);
 
-  std::packaged_task<int()> pta(inflictPainA);
-  std::future<int> a = pta.get_future();
-  std::thread ta(std::move(pta));
+  {
+    std::cout << "test 1:" << std::endl;
+    
+    std::packaged_task<int()> pta(inflictPainA);
+    std::future<int> a = pta.get_future();
+    std::thread ta(std::move(pta));
+
+    std::packaged_task<int()> ptb(inflictPainB);
+    std::future<int> b = ptb.get_future();
+    std::thread tb(std::move(ptb));
   
-  std::packaged_task<int()> ptb(inflictPainB);
-  std::future<int> b = ptb.get_future();
-  std::thread tb(std::move(ptb));
+    ta.join();
+    tb.join();
   
-  ta.join();
-  tb.join();
+    a.get();
+    b.get();
+    
+    std::cout << std::endl;
+  }
   
-  a.get();
-  b.get();
+  {
+    std::cout << "test 2:" << std::endl;
+
+    std::packaged_task<int()> pta(inflictPainA);
+    std::future<int> a = pta.get_future();
+
+    std::packaged_task<int()> ptb(inflictPainB);
+    std::future<int> b = ptb.get_future();
+  
+    pta();
+    ptb();
+  
+    a.get();
+    b.get();
+
+    std::cout << std::endl;
+  }
+
 }

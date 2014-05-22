@@ -64,27 +64,43 @@ int main()
   auto inflictPainA = std::bind(suffering, 40000);
   auto inflictPainB = std::bind(suffering, 20000);
 
-  std::cout << "test 1:" << std::endl;
-  auto a1 = inflictPainA();
-  auto b1 = inflictPainB();
-  std::cout << std::endl;
-  
-  std::cout << "test 2:" << std::endl;
-  auto a2 = std::async(std::launch::async, inflictPainA);
-  auto b2 = std::async(std::launch::async, inflictPainB);
-  a2.wait();
-  b2.wait();
-  std::cout << std::endl;
+  {
+    std::cout << "test 1:" << std::endl;
 
-  std::cout << "test 3:" << std::endl;
-  auto a3 = std::async(std::launch::deferred, inflictPainA);
-  auto b3 = std::async(std::launch::deferred, inflictPainB);
-  auto c3 = b3.get() + a3.get();
-  std::cout << std::endl;
+    auto a = inflictPainA();
+    auto b = inflictPainB();
 
-  std::cout << "test 4:" << std::endl;
-  auto a4 = std::async(std::launch::deferred | std::launch::async, inflictPainA);
-  auto b4 = std::async(std::launch::deferred | std::launch::async, inflictPainB);
-  auto c4 = b4.get() + a4.get();
-  std::cout << std::endl;
+    std::cout << std::endl;
+  }
+
+  {
+    std::cout << "test 2:" << std::endl;
+
+    auto a = std::async(std::launch::async, inflictPainA);
+    auto b = std::async(std::launch::async, inflictPainB);
+    a.wait();
+    b.wait();
+
+    std::cout << std::endl;
+  }
+
+  {
+    std::cout << "test 3:" << std::endl;
+
+    auto a = std::async(std::launch::deferred, inflictPainA);
+    auto b = std::async(std::launch::deferred, inflictPainB);
+    auto c = b.get() + a.get();
+
+    std::cout << std::endl;
+  }
+
+  {
+    std::cout << "test 4:" << std::endl;
+
+    auto a = std::async(std::launch::deferred | std::launch::async, inflictPainA);
+    auto b = std::async(std::launch::deferred | std::launch::async, inflictPainB);
+    auto c = b.get() + a.get();
+
+    std::cout << std::endl;
+  }
 }
