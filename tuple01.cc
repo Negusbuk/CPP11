@@ -22,6 +22,30 @@
 #include <tuple>
 #include <stdexcept>
 
+// helper function to print the content of a tuple of any size
+template<class tuple, std::size_t n>
+struct PrintTuple {
+  static void print(const tuple& t) {
+    PrintTuple<tuple, n-1>::print(t);
+    std::cout << ", " << std::get<n-1>(t);
+  }
+};
+ 
+template<class tuple>
+struct PrintTuple<tuple, 1>{
+  static void print(const tuple& t) {
+    std::cout << std::get<0>(t);
+  }
+};
+ 
+template<class... args>
+void print(const std::tuple<args...>& t) 
+{
+  std::cout << "(";
+  PrintTuple<decltype(t), sizeof...(args)>::print(t);
+  std::cout << ")\n";
+}
+
 // utility function that returns tuples
 std::tuple<std::string,int,int,int> makeColor(const std::string& name)
 {
@@ -61,5 +85,11 @@ int main()
   std::cout << "name:  " << name << "\n"
             << "red:   " << red << "\n"
             << "green: " << green << "\n"
-            << "blue:  " << blue << std::endl;
+            << "blue:  " << blue << "\n" << std::endl;
+
+  // get another tuple
+  auto sb = makeColor("sandy brown");
+
+  // use utility function to dump content of tuple to screen
+  print(sb);
 }
