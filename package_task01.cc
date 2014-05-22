@@ -18,39 +18,63 @@
  *******************************************************************************/
 
 #include <iostream>
-#include <future>
+#include <chrono>
 #include <thread>
+#include <future>
+#include <iomanip>
 
-auto A() -> int {
-  int sum = 0;
-  for (int i=0;i<1000000;++i) {
+using namespace std::chrono;
+
+std::mutex m;
+
+auto suffering(int n) -> int
+{
+  {
+    std::lock_guard<std::mutex> lock(m);
+    auto tp = system_clock::now();
+    auto tp_c = system_clock::to_time_t(tp);
+    std::cout << "start for  n=" << n << "\t"
+              << std::put_time(std::localtime(&tp_c), "%T")
+              << std::flush << std::endl;
+  }
+
+  auto sum = 0;
+  for (int i=0;i<n;++i) {
     sum +=i;
+    std::this_thread::sleep_for(microseconds(100));
   }
-  std::cout << "A " << sum << std::endl;
-  return sum;
-}
+  
+  {
+    std::lock_guard<std::mutex> lock(m);
 
-auto B() -> int {
-  int sum = 0;
-  for (int j=0;j<10000;++j) {
-    sum +=j;
+    std::cout << "result for n=" << n << "\t" << sum << std::endl;
+
+    auto tp = system_clock::now();
+    auto tp_c = system_clock::to_time_t(tp);
+    std::cout << "end for    n=" << n << "\t"
+              << std::put_time(std::localtime(&tp_c), "%T")
+              << std::flush << std::endl;
   }
-  std::cout << "B " << sum << std::endl;
+            
   return sum;
 }
 
 int main()
 {
-  std::packaged_task<int()> ta([](){ return A(); });
-  std::future<int> a = ta.get_future();
-  std::thread(std::move(ta)).detach();
+  auto inflictPainA = std::bind(suffering, 40000);
+  auto inflictPainB = std::bind(suffering, 20000);
 
-  std::packaged_task<int()> tb([](){ return B(); });
-  std::future<int> b = tb.get_future();
-  std::thread(std::move(tb)).detach();
-
-  a.wait();
-  b.wait();
-
-  std::cout << a.get() << " " << b.get() << std::endl;
+  std::packaged_task<int()> pta(inflictPainA);
+  std::future<int> a = pta.get_future();
+  std::thread ta(std::move(pta));
+  
+  std::packaged_task<int()> ptb(inflictPainB);
+  std::future<int> b = ptb.get_future();
+  std::thread tb(std::move(ptb));
+  
+  ta.join();
+  tb.join();
+  
+  a.get();
+  b.get();
 }
