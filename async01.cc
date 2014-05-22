@@ -25,17 +25,18 @@
 
 using namespace std::chrono;
 
+std::mutex m;
+
 auto suffering(int n) -> int
 {
-  std::mutex m;
-
-  m.lock();
-  auto tp = system_clock::now();
-  auto tp_c = system_clock::to_time_t(tp);
-  std::cout << "start for  n=" << n << "\t"
-            << std::put_time(std::localtime(&tp_c), "%T")
-            << std::flush << std::endl;
-  m.unlock();
+  {
+    std::lock_guard<std::mutex> lock(m);
+    auto tp = system_clock::now();
+    auto tp_c = system_clock::to_time_t(tp);
+    std::cout << "start for  n=" << n << "\t"
+              << std::put_time(std::localtime(&tp_c), "%T")
+              << std::flush << std::endl;
+  }
 
   auto sum = 0;
   for (int i=0;i<n;++i) {
@@ -43,24 +44,25 @@ auto suffering(int n) -> int
     std::this_thread::sleep_for(microseconds(100));
   }
   
-  m.lock();
+  {
+    std::lock_guard<std::mutex> lock(m);
 
-  std::cout << "result for n=" << n << "\t" << sum << std::endl;
+    std::cout << "result for n=" << n << "\t" << sum << std::endl;
 
-  tp = system_clock::now();
-  tp_c = system_clock::to_time_t(tp);
-  std::cout << "end for    n=" << n << "\t"
-            << std::put_time(std::localtime(&tp_c), "%T")
-            << std::flush << std::endl;
-  m.unlock();
+    auto tp = system_clock::now();
+    auto tp_c = system_clock::to_time_t(tp);
+    std::cout << "end for    n=" << n << "\t"
+              << std::put_time(std::localtime(&tp_c), "%T")
+              << std::flush << std::endl;
+  }
             
   return sum;
 }
 
 int main()
 {
-  auto inflictPainA = std::bind(suffering, 100000);
-  auto inflictPainB = std::bind(suffering, 10000);
+  auto inflictPainA = std::bind(suffering, 40000);
+  auto inflictPainB = std::bind(suffering, 20000);
 
   std::cout << "test 1:" << std::endl;
   auto a1 = inflictPainA();
