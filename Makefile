@@ -8,7 +8,7 @@ TARGETS = auto01 \
           unordered_multimap01 \
           unordered_map02 \
           async01 \
-          package_task01 \
+          packaged_task01 \
           promise01 \
           thread01 \
           thread02 \
