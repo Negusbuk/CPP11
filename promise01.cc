@@ -18,43 +18,73 @@
  *******************************************************************************/
 
 #include <iostream>
-#include <future>
+#include <chrono>
 #include <thread>
+#include <future>
+#include <iomanip>
 
-auto A() -> int {
-  int sum = 0;
-  for (int i=0;i<1000000;++i) {
+using namespace std::chrono;
+
+std::mutex m;
+
+class suffering
+{
+  std::promise<int> promise_;
+  std::thread thread_;
+  int count_;
+
+  void run() { 
+  {
+    std::lock_guard<std::mutex> lock(m);
+    auto tp = system_clock::now();
+    auto tp_c = system_clock::to_time_t(tp);
+    std::cout << "start for  n=" << count_ << "\t"
+              << std::put_time(std::localtime(&tp_c), "%T")
+              << std::flush << std::endl;
+  }
+
+  auto sum = 0;
+  for (int i=0;i<count_;++i) {
     sum +=i;
+    std::this_thread::sleep_for(microseconds(100));
   }
-  std::cout << "A " << sum << std::endl;
-  return sum;
-}
+  
+  {
+    std::lock_guard<std::mutex> lock(m);
 
-auto B() -> int {
-  int sum = 0;
-  for (int j=0;j<10000;++j) {
-    sum +=j;
+    std::cout << "result for n=" << count_ << "\t" << sum << std::endl;
+
+    auto tp = system_clock::now();
+    auto tp_c = system_clock::to_time_t(tp);
+    std::cout << "end for    n=" << count_ << "\t"
+              << std::put_time(std::localtime(&tp_c), "%T")
+              << std::flush << std::endl;
   }
-  std::cout << "B " << sum << std::endl;
-  return sum;
-}
+  
+  promise_.set_value(sum);
+  }
+  
+  public:
+  
+  suffering(int n)
+  :count_(n),
+   thread_(&suffering::run, this) {
+     thread_.detach();
+  }
+
+  std::future<int> get_future() {
+    return promise_.get_future();
+  }
+};
 
 int main()
 {
-  std::promise<int> pa;
-  std::future<int> a = pa.get_future();
-  std::thread ta([](std::promise<int>& p){ p.set_value(A()); },
-                 std::ref(pa));
+  suffering inflictPainA(40000);
+  std::future<int> a = inflictPainA.get_future();
 
-  std::promise<int> pb;
-  std::future<int> b = pb.get_future();
-  std::thread tb([](std::promise<int>& p){ p.set_value(B()); },
-                 std::ref(pb));
-
-  a.wait();
-  b.wait();
-
-  std::cout << a.get() << " " << b.get() << std::endl;
-  ta.join();
-  tb.join();
+  suffering inflictPainB(20000);
+  std::future<int> b = inflictPainB.get_future();
+  
+  a.get();
+  b.get();
 }
