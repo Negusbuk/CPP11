@@ -34,44 +34,44 @@ class suffering
   int count_;
 
   void run() { 
-  {
-    std::lock_guard<std::mutex> lock(m);
-    auto tp = system_clock::now();
-    auto tp_c = system_clock::to_time_t(tp);
-    std::cout << "start for  n=" << count_ << "\t"
-              << std::put_time(std::localtime(&tp_c), "%T")
-              << std::flush << std::endl;
-  }
+    {
+      std::lock_guard<std::mutex> lock(m);
+      auto tp = system_clock::now();
+      auto tp_c = system_clock::to_time_t(tp);
+      std::cout << "start for  n=" << count_ << "\t"
+                << std::put_time(std::localtime(&tp_c), "%T")
+                << std::flush << std::endl;
+    }
 
-  auto sum = 0;
-  for (int i=0;i<count_;++i) {
-    sum +=i;
-    std::this_thread::sleep_for(microseconds(100));
+    auto sum = 0;
+    for (int i=0;i<count_;++i) {
+      sum +=i;
+      std::this_thread::sleep_for(microseconds(100));
+    }
+
+    {
+      std::lock_guard<std::mutex> lock(m);
+
+      std::cout << "result for n=" << count_ << "\t" << sum << std::endl;
+
+      auto tp = system_clock::now();
+      auto tp_c = system_clock::to_time_t(tp);
+      std::cout << "end for    n=" << count_ << "\t"
+                << std::put_time(std::localtime(&tp_c), "%T")
+                << std::flush << std::endl;
+    }
+
+    promise_.set_value(sum);
   }
   
-  {
-    std::lock_guard<std::mutex> lock(m);
-
-    std::cout << "result for n=" << count_ << "\t" << sum << std::endl;
-
-    auto tp = system_clock::now();
-    auto tp_c = system_clock::to_time_t(tp);
-    std::cout << "end for    n=" << count_ << "\t"
-              << std::put_time(std::localtime(&tp_c), "%T")
-              << std::flush << std::endl;
+public:
+  
+  suffering(int n) :
+    count_(n),
+    thread_(&suffering::run, this) {
+    thread_.detach();
   }
   
-  promise_.set_value(sum);
-  }
-  
-  public:
-  
-  suffering(int n)
-  :count_(n),
-   thread_(&suffering::run, this) {
-     thread_.detach();
-  }
-
   std::future<int> get_future() {
     return promise_.get_future();
   }
