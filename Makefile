@@ -3,7 +3,9 @@ TARGETS = auto01 \
           array01 \
           list_initialization01 \
           unordered_set01 \
+          unordered_multiset01 \
           unordered_map01 \
+          unordered_multimap01 \
           unordered_map02 \
           async01 \
           package_task01 \
