@@ -54,16 +54,28 @@ int A::objCount_ = 0;
 
 int main()
 {
-  std::unique_ptr<A> p1(new A());
+  {
+    std::unique_ptr<A> p(new A());
+    std::cout << "p: " << p.get() << std::endl;
+    p->func();
+  }
+  std::cout << std::endl;
 
-  p1->func();
+  {
+    std::unique_ptr<A> p1(new A());
+    std::cout << "p1: "<< p1.get() << std::endl;
+    p1->func();
 
-  // A a;
-  // std::unique_ptr<A> p2(&a); // crash due to double delete
+    std::unique_ptr<A> p2 = std::move(p1);
+    std::cout << "p1: "<< p1.get() << std::endl;
+    std::cout << "p2: "<< p2.get() << std::endl;
+    p2->func();
+  }
+  std::cout << std::endl;
 
-  // std::unique_ptr<A> p2 = p1; // does not compile
-
-  std::unique_ptr<A> p2 = std::move(p1);
-
-  (*p2).func();
+  {
+    A a;
+    std::unique_ptr<A> p(&a); // crash due to double delete
+    std::cout << "p: "<< p.get() << std::endl;
+  }
 }
