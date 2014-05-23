@@ -20,88 +20,52 @@
 #include <iostream>
 #include <vector>
 
-class A
-{
-public:
-  A(size_t sz)
-  :size_(sz), buffer_(new char [sz]) {
-    objId_ = ++objCount_;
-    std::cout << "A::A(" << size_ << "): " << objId_ << std::endl;
-  }
-
-  A(const A& other)
-    :size_(other.size_), buffer_(new char [other.size_]) {
-    std::copy(other.buffer_, other.buffer_+size_, buffer_);
-    objId_ = ++objCount_;
-    std::cout << "A::A(const A& other): " << objId_ << " from " << other.objId_ << std::endl;
-  }
-
-  A(A&& other)
-    :size_(other.size_), buffer_(other.buffer_) {
-    other.size_ = 0;
-    other.buffer_ = 0;
-    objId_ = ++objCount_;
-    std::cout << "A::A(A&& other): " << objId_ << " from " << other.objId_ << std::endl;
-  }
-
-  ~A() {
-    std::cout << "A::~A(" << size_ << "): " << objId_ << std::endl;
-    size_ = 0;
-    delete [] buffer_;
-  }
-
-  size_t size_;
-  char * buffer_;
-  static int objCount_;
-  int objId_;
-};
-
-int A::objCount_ = 0;
+#include "testclass.h"
 
 int main()
 {
   std::cout << "--> test 1" << std::endl;
   {
-    std::vector<A> va;
+    std::vector<TestClass> v;
 
-    std::cout << "create a1:" << std::endl;
-    A a1(1024);
+    std::cout << "create obj:" << std::endl;
+    TestClass obj(1024);
     std::cout << std::endl;
 
-    std::cout << "push a1 into vector (lvalue):" << std::endl;
-    va.push_back(a1);
+    std::cout << "push obj into vector (lvalue):" << std::endl;
+    v.push_back(obj);
     std::cout << std::endl;
   }
   std::cout << "<-- test 1\n" << std::endl;
 
   std::cout << "--> test 2" << std::endl;
   {
-    std::vector<A> va;
+    std::vector<TestClass> v;
 
-    std::cout << "create a2:" << std::endl;
-    A a2(1024);
+    std::cout << "create obj1:" << std::endl;
+    TestClass obj1(1024);
     std::cout << std::endl;
 
-    std::cout << "create a3 from a2 (lvalue/copy):" << std::endl;
-    A a3(a2);
+    std::cout << "create obj2 from obj1 (lvalue/copy):" << std::endl;
+    TestClass obj2(obj1);
     std::cout << std::endl;
 
-    std::cout << "push a3 into vector (lvalue):" << std::endl;
-    va.push_back(a3);
+    std::cout << "push obj2 into vector (lvalue):" << std::endl;
+    v.push_back(obj2);
     std::cout << std::endl;
   }
   std::cout << "<-- test 2\n" << std::endl;
 
   std::cout << "--> test 3" << std::endl;
   {
-    std::vector<A> va;
+    std::vector<TestClass> v;
 
-    std::cout << "create a4:" << std::endl;
-    A a4(1024);
+    std::cout << "create obj:" << std::endl;
+    TestClass obj(1024);
     std::cout << std::endl;
 
-    std::cout << "push a3 into vector (rvalue/move):" << std::endl;
-    va.push_back(std::move(a4));
+    std::cout << "push obj into vector (rvalue/move):" << std::endl;
+    v.push_back(std::move(obj));
     std::cout << std::endl;
   }
   std::cout << "<-- test 3\n" << std::endl;
@@ -109,24 +73,24 @@ int main()
   std::cout << "--> test 4" << std::endl;
   {
     std::cout << "create a5:" << std::endl;
-    A a5(1024);
+    TestClass obj1(1024);
     std::cout << std::endl;
 
-    std::cout << "create a6 from a5 (rvalue/move):" << std::endl;
-    A a6(std::move(a5));
+    std::cout << "create obj2 from obj1 (rvalue/move):" << std::endl;
+    TestClass obj2(std::move(obj1));
     std::cout << std::endl;
   }
   std::cout << "<-- test 4\n" << std::endl;
 
   std::cout << "--> test 5" << std::endl;
   {
-    std::cout << "create a7:" << std::endl;
-    A a7(1024);
+    std::cout << "create obj1:" << std::endl;
+    TestClass obj1(1024);
     std::cout << std::endl;
 
-    std::cout << "create a8 from a5 (rvalue):" << std::endl;
-    A a8(static_cast<A&&>(a7));
+    std::cout << "create obj2 from obj1 (rvalue):" << std::endl;
+    TestClass obj2(static_cast<TestClass&&>(obj1));
     std::cout << std::endl;
   }
-  std::cout << "<-- test 5" << std::endl;
+  std::cout << "<-- test 5\n" << std::endl;
 }
