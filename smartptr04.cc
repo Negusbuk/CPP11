@@ -22,9 +22,15 @@
 
 #include "smartptrtestclass.h"
 
-void f(std::weak_ptr<SmartPtrTestClass>& wp)
+void function(std::weak_ptr<SmartPtrTestClass>& wp)
 {
+  std::cout << "f(wp): " << wp.use_count() << std::endl;
+
   auto sp = wp.lock(); // sp is a std::shared_ptr<SmartPtrTestClass>
+
+  std::cout << "f(wp): " << wp.use_count() << std::endl;
+  std::cout << "f(sp): " << sp.get() << " " << sp.use_count() << std::endl;
+  std::cout << std::endl;
 
   if (sp) {
     sp->func();
@@ -36,13 +42,27 @@ void f(std::weak_ptr<SmartPtrTestClass>& wp)
 int main()
 {
   std::weak_ptr<SmartPtrTestClass> wp;
+  std::cout << "wp:    " << wp.use_count() << std::endl;
 
   {
     std::shared_ptr<SmartPtrTestClass> sp(new SmartPtrTestClass);
-    wp = sp;
+    std::cout << "sp:   " << sp.get() << " " << sp.use_count() << std::endl;
+    std::cout << std::endl;
 
-    f(wp);
+    wp = sp;
+    std::cout << "wp:   " << wp.use_count() << std::endl;
+    std::cout << "sp:   " << sp.get() << " " << sp.use_count() << std::endl;
+    std::cout << std::endl;
+
+    function(wp);
+
+    std::cout << "wp:   " << wp.use_count() << std::endl;
+    std::cout << "sp:   " << sp.get() << " " << sp.use_count() << std::endl;
+    std::cout << std::endl;
   }
 
-  f(wp);
+  std::cout << "wp:   " << wp.use_count() << std::endl;
+  std::cout << std::endl;
+
+  function(wp);
 }
