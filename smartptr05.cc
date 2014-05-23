@@ -57,22 +57,35 @@ public:
 
 int main()
 {
+
+  {
+    A* a = new A;
+
+    std::shared_ptr<A> ap1(a);
+    std::cout << "ap1: " << ap1.get() << " " << ap1.use_count() << std::endl;
+
+    std::shared_ptr<A> ap2 = a->getSharedPtr();
+    std::cout << "ap2: " << ap2.get() << " " << ap2.use_count() << std::endl;
+
+    {
+      std::shared_ptr<A> ap3 = a->getSharedPtr();
+      std::cout << "ap3: " << ap3.get() << " " << ap3.use_count() << std::endl;
+    }
+    std::cout << "ap1: " << ap1.get() << " " << ap1.use_count() << std::endl;
+    std::cout << "ap2: " << ap2.get() << " " << ap2.use_count() << std::endl;
+
+    std::shared_ptr<A> ap4 = a->shared_from_this();
+    std::cout << "ap4: " << ap4.get() << " " << ap4.use_count() << std::endl;
+  }
+  std::cout << std::endl;
+
   {
     B* b = new B;
     std::shared_ptr<B> bp1(b);
     std::cout << bp1.get() << " " << bp1.use_count() << std::endl;
 
     // crash due to double delete
-    // std::shared_ptr<B> bp2 = b->getSharedPtr();
-    // std::cout << bp2.get() << " " << bp2.use_count() << std::endl;
-  }
-
-  {
-    A* a = new A;
-    std::shared_ptr<A> ap1(a);
-    std::cout << ap1.get() << " " << ap1.use_count() << std::endl;
-
-    std::shared_ptr<A> ap2 = a->getSharedPtr();
-    std::cout << ap2.get() << " " << ap2.use_count() << std::endl;
+    std::shared_ptr<B> bp2 = b->getSharedPtr();
+    std::cout << bp2.get() << " " << bp2.use_count() << std::endl;
   }
 }
