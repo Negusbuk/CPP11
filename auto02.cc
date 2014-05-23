@@ -28,13 +28,13 @@ auto add(T t, U u) -> decltype(t + u) // the return type of add is the type of o
 }
 
 auto get_fun(int arg)->double(*)(double) // same as double (*get_fun(int))(double)
-    {
+{
   switch (arg) {
   case 1: return std::fabs;
   case 2: return std::sin;
   default: return std::cos;
   }
-    }
+}
 
 int main()
 {
