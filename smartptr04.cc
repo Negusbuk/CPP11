@@ -20,40 +20,11 @@
 #include <memory>
 #include <iostream>
 
-class A
+#include "smartptrtestclass.h"
+
+void f(std::weak_ptr<SmartPtrTestClass>& wp)
 {
-public:
-  A() {
-    objId_ = ++objCount_;
-    std::cout << "A::A(): " << objId_ << std::endl;
-  }
-
-  A(const A& other) {
-    objId_ = ++objCount_;
-    std::cout << "A::A(const A& other): " << objId_ << " from " << other.objId_ << std::endl;
-  }
-
-  A(A&& other) {
-    objId_ = ++objCount_;
-    std::cout << "A::A(A&& other): " << objId_ << " from " << other.objId_ << std::endl;
-  }
-
-  ~A() {
-    std::cout << "A::~A(): " << objId_ << std::endl;
-  }
-
-  void func() {
-    std::cout << "A::func(): " << objId_ << std::endl;;
-  }
-
-  static int objCount_;
-  int objId_;
-};
-
-int A::objCount_ = 0;
-
-void f(std::weak_ptr<A>& wp) {
-  auto sp = wp.lock(); // sp is a std::shared_ptr<A>
+  auto sp = wp.lock(); // sp is a std::shared_ptr<SmartPtrTestClass>
 
   if (sp) {
     sp->func();
@@ -64,10 +35,10 @@ void f(std::weak_ptr<A>& wp) {
 
 int main()
 {
-  std::weak_ptr<A> wp;
+  std::weak_ptr<SmartPtrTestClass> wp;
 
   {
-    std::shared_ptr<A> sp(new A);
+    std::shared_ptr<SmartPtrTestClass> sp(new SmartPtrTestClass);
     wp = sp;
 
     f(wp);

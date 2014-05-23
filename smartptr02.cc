@@ -21,59 +21,38 @@
 #include <iostream>
 #include <vector>
 
-class A
-{
-public:
-  A() {
-    objId_ = ++objCount_;
-    std::cout << "A::A(): " << objId_ << std::endl;
-  }
-
-  A(const A& other) {
-    objId_ = ++objCount_;
-    std::cout << "A::A(const A& other): " << objId_ << " from " << other.objId_ << std::endl;
-  }
-
-  A(A&& other) {
-    objId_ = ++objCount_;
-    std::cout << "A::A(A&& other): " << objId_ << " from " << other.objId_ << std::endl;
-  }
-
-  ~A() {
-    std::cout << "A::~A(): " << objId_ << std::endl;
-  }
-
-  void func() {
-    std::cout << "A::func(): " << objId_ << std::endl;;
-  }
-
-  static int objCount_;
-  int objId_;
-};
-
-int A::objCount_ = 0;
+#include "smartptrtestclass.h"
 
 int main()
 {
-  std::vector<std::unique_ptr<A>> v;
+  std::vector<std::unique_ptr<SmartPtrTestClass>> v;
 
-  v.push_back(std::unique_ptr<A>(new A));
-  v.push_back(std::unique_ptr<A>(new A));
+  v.push_back(std::unique_ptr<SmartPtrTestClass>(new SmartPtrTestClass));
+  v.push_back(std::unique_ptr<SmartPtrTestClass>(new SmartPtrTestClass));
 
-  std::cout << v[0].get() << std::endl;
-  std::cout << v[1].get() << std::endl;
+  std::cout << "v[0]: " << v[0].get() << std::endl;
+  v[0]->func();
+  std::cout << "v[1]: " << v[1].get() << std::endl;
   v[1]->func();
+  std::cout << std::endl;
+
+  v[0].swap(v[1]);
+  std::cout << "v[0]: " << v[0].get() << std::endl;
+  v[0]->func();
+  std::cout << "v[1]: " << v[1].get() << std::endl;
+  v[1]->func();
+  std::cout << std::endl;
+  std::swap(v[0], v[1]);
 
   v[0] = std::move(v[1]);
-
-  std::cout << v[0].get() << std::endl;
-  std::cout << v[1].get() << std::endl;
+  std::cout << "v[0]: " << v[0].get() << std::endl;
+  std::cout << "v[1]: " << v[1].get() << std::endl;
   v[0]->func();
-  // v[1]->func(); // segmentation violation
+  std::cout << std::endl;
 
-  std::unique_ptr<A> p = std::move(v[0]);
-  std::cout << v[0].get() << std::endl;
-  // v[0]->func(); // segmentation violation
-
+  std::unique_ptr<SmartPtrTestClass> p = std::move(v[0]);
+  std::cout << "v[0]: " << v[0].get() << std::endl;
+  std::cout << "v[1]: " << v[1].get() << std::endl;
+  std::cout << "p:    " << p.get() << std::endl;
   p->func();
 }

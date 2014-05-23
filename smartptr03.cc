@@ -21,57 +21,36 @@
 #include <iostream>
 #include <vector>
 
-class A
-{
-public:
-  A() {
-    objId_ = ++objCount_;
-    std::cout << "A::A(): " << objId_ << std::endl;
-  }
-
-  A(const A& other) {
-    objId_ = ++objCount_;
-    std::cout << "A::A(const A& other): " << objId_ << " from " << other.objId_ << std::endl;
-  }
-
-  A(A&& other) {
-    objId_ = ++objCount_;
-    std::cout << "A::A(A&& other): " << objId_ << " from " << other.objId_ << std::endl;
-  }
-
-  ~A() {
-    std::cout << "A::~A(): " << objId_ << std::endl;
-  }
-
-  void func() {
-    std::cout << "A::func(): " << objId_ << std::endl;;
-  }
-
-  static int objCount_;
-  int objId_;
-};
-
-int A::objCount_ = 0;
+#include "smartptrtestclass.h"
 
 int main()
 {
-  std::shared_ptr<A> p1(new A);
+  std::shared_ptr<SmartPtrTestClass> p1(new SmartPtrTestClass);
 
   {
-    std::vector<std::shared_ptr<A>> v;
+    std::vector<std::shared_ptr<SmartPtrTestClass>> v;
 
-    std::shared_ptr<A> p2(new A);
+    std::shared_ptr<SmartPtrTestClass> p2(new SmartPtrTestClass);
 
-    std::cout << p1.get() << " " << p1.use_count() << std::endl;
-    std::cout << p2.get() << " " << p2.use_count() << std::endl;
+    std::cout << "p1: " << p1.get() << " " << p1.use_count() << std::endl;
+    std::cout << "p1: " << p2.get() << " " << p2.use_count() << std::endl;
+    std::cout << std::endl;
 
     v.push_back(p1);
+    std::cout << "p1: " << p1.get() << " " << p1.use_count() << std::endl;
+    std::cout << "p1: " << p2.get() << " " << p2.use_count() << std::endl;
+    std::cout << std::endl;
+
     v.push_back(p2);
-    v.push_back(p1);
+    std::cout << "p1: " << p1.get() << " " << p1.use_count() << std::endl;
+    std::cout << "p1: " << p2.get() << " " << p2.use_count() << std::endl;
+    std::cout << std::endl;
 
-    std::cout << p1.get() << " " << p1.use_count() << std::endl;
-    std::cout << p2.get() << " " << p2.use_count() << std::endl;
+    v.push_back(p1);
+    std::cout << "p1: " << p1.get() << " " << p1.use_count() << std::endl;
+    std::cout << "p1: " << p2.get() << " " << p2.use_count() << std::endl;
+    std::cout << std::endl;
   }
 
-  std::cout << p1.get() << " " << p1.use_count() << std::endl;
+  std::cout << "p1: " << p1.get() << " " << p1.use_count() << std::endl;
 }
