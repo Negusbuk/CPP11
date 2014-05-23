@@ -20,53 +20,23 @@
 #include <memory>
 #include <iostream>
 
-class A
-{
-public:
-  A() {
-    objId_ = ++objCount_;
-    std::cout << "A::A(): " << objId_ << std::endl;
-  }
-
-  A(const A& other) {
-    objId_ = ++objCount_;
-    std::cout << "A::A(const A& other): " << objId_ << " from " << other.objId_ << std::endl;
-  }
-
-  A(A&& other) {
-    objId_ = ++objCount_;
-    std::cout << "A::A(A&& other): " << objId_ << " from " << other.objId_ << std::endl;
-  }
-
-  ~A() {
-    std::cout << "A::~A(): " << objId_ << std::endl;
-  }
-
-  void func() {
-    std::cout << "A::func(): " << objId_ << std::endl;;
-  }
-
-  static int objCount_;
-  int objId_;
-};
-
-int A::objCount_ = 0;
+#include "smartptrtestclass.h"
 
 int main()
 {
   {
-    std::unique_ptr<A> p(new A());
+    std::unique_ptr<SmartPtrTestClass> p(new SmartPtrTestClass());
     std::cout << "p: " << p.get() << std::endl;
     p->func();
   }
   std::cout << std::endl;
 
   {
-    std::unique_ptr<A> p1(new A());
+    std::unique_ptr<SmartPtrTestClass> p1(new SmartPtrTestClass());
     std::cout << "p1: "<< p1.get() << std::endl;
     p1->func();
 
-    std::unique_ptr<A> p2 = std::move(p1);
+    std::unique_ptr<SmartPtrTestClass> p2 = std::move(p1);
     std::cout << "p1: "<< p1.get() << std::endl;
     std::cout << "p2: "<< p2.get() << std::endl;
     p2->func();
@@ -74,8 +44,8 @@ int main()
   std::cout << std::endl;
 
   {
-    A a;
-    std::unique_ptr<A> p(&a); // crash due to double delete
+    SmartPtrTestClass sptc;
+    std::unique_ptr<SmartPtrTestClass> p(&sptc); // crash due to double delete
     std::cout << "p: "<< p.get() << std::endl;
   }
 }
